@@ -1,10 +1,15 @@
 box::use(
   dplyr,
   fs[path],
+  lubridate[as_date, floor_date],
   magrittr[`%>%`],
   purrr[map_lgl],
   stringr[str_split],
   tibble[is_tibble],
+)
+
+box::use(
+  app/logic/config_settings[is_config_valid, read_config_yml],
 )
 
 #' @export
@@ -15,6 +20,15 @@ AGG_LEVELS <- c("content_guid", "user_guid", "start_date") # nolint: object_name
 
 #' @export
 AGG_TIME_LEVELS <- c("Daily" = "day", "Weekly" = "week", "Monthly" = "month") # nolint: object_name_linter
+
+config <- read_config_yml()
+
+#' @export
+week_start_day <- ifelse(
+  isTRUE(is_config_valid(config, "week_start")),
+  config$week_start[[1]],
+  "Monday"
+)
 
 #' Maps the day of the week to an integer between 1 to 7
 #' where 1 indicates a Monday and a 7 indicates a Sunday
@@ -28,6 +42,9 @@ map_wday <- function(dow) {
   )
   return(match(tolower(dow), dows))
 }
+
+#' @export
+week_start_id <- map_wday(week_start_day)
 
 #' Retrieves the goal from a dataframe assuming the following structure
 #' columns:
@@ -68,22 +85,6 @@ get_goal_spec <- function(goal_df, agg_levels, date_agg) {
 #' @export
 filter_data_by_user <- function(df, users) {
   df %>% dplyr$filter(!(username %in% users))
-}
-
-#' Get average value of column grouped by another column in dataframe
-#' @param agg_usage Aggregated usage data frame
-#' @param group_by Column name to group data
-#' @param column Column name to calculate average
-#' @return Average value of column grouped by another column in dataframe
-#' @export
-get_grouped_average <- function(df, group_by, column) {
-  grouped_df <- df %>%
-    dplyr$group_by(.data[[group_by]]) %>%
-    dplyr$summarise(
-      avg_column = sum(.data[[column]])
-    )
-
-  mean(grouped_df$avg_column)
 }
 
 #' Process goal configuration for charts
@@ -139,4 +140,31 @@ create_image_path <- function(image_path) {
 get_app_titles <- function(titles, names) {
   has_title <- !is.na(titles) & titles != ""
   ifelse(has_title, titles, names)
+}
+
+#' Get date range length in selected units
+#' @param start_date Date
+#' @param end_date Date
+#' @param unit Date unit (day, week, month)
+#' @param week_start Week start day id, defaults to week_start set in config.yml
+#' @return Date range length in selected units (number)
+#' @export
+get_date_range_length_in_units <- function(
+  start_date,
+  end_date,
+  unit = c("day", "week", "month"),
+  week_start = week_start_id
+) {
+  start_date <- as_date(start_date)
+  end_date <- as_date(end_date)
+
+  # Return 0 if start date is greater than end date
+  if (start_date > end_date) {
+    return(0)
+  }
+
+  date_seq <- seq(start_date, end_date, by = "day")
+
+  floored_date_seq <- floor_date(date_seq, unit, week_start)
+  length(unique(floored_date_seq))
 }

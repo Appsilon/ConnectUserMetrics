@@ -74,6 +74,10 @@ validate_goal <- function(config, goal_type) {
 }
 
 validate_week_start <- function(config) {
+  if (is.null(config$week_start)) {
+    return(FALSE)
+  }
+
   dows <- c(
     "monday", "tuesday", "wednesday", "thursday", "friday",
     "saturday", "sunday"

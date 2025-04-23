@@ -169,4 +169,13 @@ testthat$test_that("validate_week_start validates day names correctly", {
 
   config <- list(week_start = "MONDAY") # Case sensitive
   testthat$expect_false(impl$validate_week_start(config))
+
+  config <- list(week_start = NULL)
+  testthat$expect_false(impl$validate_week_start(config))
+
+  config <- list(week_start = NA)
+  testthat$expect_false(impl$validate_week_start(config))
+
+  config <- list(week_start = "")
+  testthat$expect_false(impl$validate_week_start(config))
 })

@@ -1,5 +1,6 @@
 box::use(
-  testthat[expect_equal, expect_null, expect_true, test_that],
+  lubridate[as_date, days],
+  testthat[expect_equal, expect_null, test_that],
 )
 
 box::use(
@@ -59,7 +60,9 @@ test_that("get_goal_spec captures comma separated lists", {
   expect_equal(
     28,
     impl$get_goal_spec(
-      test_goal_df, agg_levels = c("start_date", "content_guid"), date_agg = c("day")
+      test_goal_df,
+      agg_levels = c("start_date", "content_guid"),
+      date_agg = c("day")
     )
   )
 })
@@ -73,7 +76,9 @@ test_that("get_goal_spec avoids whitespace in user input", {
   expect_equal(
     28,
     impl$get_goal_spec(
-      test_goal_df, agg_levels = c("start_date", "content_guid"), date_agg = c("day")
+      test_goal_df,
+      agg_levels = c("start_date", "content_guid"),
+      date_agg = c("day")
     )
   )
 })
@@ -87,7 +92,9 @@ test_that("get_goal_spec is robust to ordering of agg_level in input_df", {
   expect_equal(
     28,
     impl$get_goal_spec(
-      test_goal_df, agg_levels = c("start_date", "content_guid"), date_agg = c("day")
+      test_goal_df,
+      agg_levels = c("start_date", "content_guid"),
+      date_agg = c("day")
     )
   )
 
@@ -115,7 +122,9 @@ test_that("get_goal_spec is robust to ordering of agg_level in func args", {
   expect_equal(
     28,
     impl$get_goal_spec(
-      test_goal_df, agg_levels = c("content_guid", "start_date"), date_agg = c("day")
+      test_goal_df,
+      agg_levels = c("content_guid", "start_date"),
+      date_agg = c("day")
     )
   )
 
@@ -145,38 +154,6 @@ test_that("process_chart_goal handles NULL input", {
   expect_null(
     utils$process_chart_goal(NULL, agg_levels = c("start_date"), date_aggregation = "day")
   )
-})
-
-test_that("get_grouped_average returns correct overall average for basic grouping", {
-  df <- data.frame(
-    group = c("A", "A", "B", "B"),
-    value = c(1, 2, 3, 4)
-  )
-
-  # For group "A": sum = 1 + 2 = 3; for group "B": sum = 3 + 4 = 7.
-  # Overall average = (3 + 7) / 2 = 5.
-  result <- utils$get_grouped_average(df, "group", "value")
-  expect_equal(result, 5)
-})
-
-test_that("get_grouped_average returns the group sum as average when only one group is present", {
-  df <- data.frame(
-    group = c("A", "A", "A"),
-    value = c(2, 3, 5)
-  )
-
-  # Group "A": sum = 2 + 3 + 5 = 10; overall average should be 10.
-  result <- utils$get_grouped_average(df, "group", "value")
-  expect_equal(result, 10)
-})
-
-test_that("get_grouped_average returns NA when missing values cause group sums to be NA", {
-  df <- data.frame(
-    group = c("A", "A", "B"),
-    value = c(1, NA, 3)
-  )
-  result <- utils$get_grouped_average(df, "group", "value")
-  expect_true(is.na(result))
 })
 
 test_that("create_image_path returns image path when image filename is given as an input", {
@@ -233,5 +210,111 @@ test_that("get_app_titles returns app names instead of empty titles", {
   expect_equal(
     c("test_name_1", "test_title_2", "test_name_3"),
     utils$get_app_titles(apps$title, apps$name)
+  )
+})
+
+test_that("get_date_range_length_in_units returns zero when start date is greater than end date", {
+  expect_equal(
+    0,
+    utils$get_date_range_length_in_units(
+      start_date = "2025-04-01",
+      end_date = "2025-03-01",
+      unit = "day"
+    )
+  )
+})
+
+test_that("get_date_range_length_in_units returns difference between two dates in days", {
+  expect_equal(
+    1,
+    utils$get_date_range_length_in_units(
+      start_date = "2025-03-01",
+      end_date = "2025-03-01",
+      unit = "day"
+    )
+  )
+
+  expect_equal(
+    32,
+    utils$get_date_range_length_in_units(
+      start_date = "2025-03-01",
+      end_date = "2025-04-01",
+      unit = "day"
+    )
+  )
+})
+
+test_that("get_date_range_length_in_units returns difference between two dates in weeks", {
+  week_day_ids <- seq(1:7)
+  names(week_day_ids) <- c(
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday"
+  )
+
+  # Check each day in the period of two calendar weeks
+  for (i in 0:13) {
+    initial_monday <- as_date("2025-03-03")
+
+    expect_equal(
+      utils$get_date_range_length_in_units(
+        start_date = initial_monday,
+        end_date = initial_monday + days(i),
+        unit = "week",
+        week_start = week_day_ids["Monday"]
+      ),
+      1 + i %/% 7
+    )
+  }
+
+  # Check same date range with different week start days
+  expect_equal(
+    6,
+    utils$get_date_range_length_in_units(
+      start_date = "2025-03-02", # Sunday
+      end_date = "2025-04-01",
+      unit = "week",
+      week_start = week_day_ids["Monday"]
+    )
+  )
+
+  expect_equal(
+    5,
+    utils$get_date_range_length_in_units(
+      start_date = "2025-03-02", # Sunday
+      end_date = "2025-04-01",
+      unit = "week",
+      week_start = week_day_ids["Sunday"]
+    )
+  )
+})
+
+test_that("get_date_range_length_in_units returns difference between two dates in months", {
+  # Each day in the same month return same length in months
+  for (i in 0:30) {
+    initial_day <- as_date("2025-03-01")
+
+    expect_equal(
+      1,
+      utils$get_date_range_length_in_units(
+        start_date = initial_day,
+        end_date = initial_day + days(i),
+        unit = "month"
+      )
+    )
+  }
+
+  # Date range of two calendar months
+  expect_equal(
+    2,
+    utils$get_date_range_length_in_units(
+      start_date = "2025-03-01",
+      end_date = "2025-04-01",
+      unit = "month"
+    )
   )
 })

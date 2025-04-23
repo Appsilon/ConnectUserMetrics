@@ -3,7 +3,7 @@ box::use(
   echarts4r,
   glue[glue],
   htmlwidgets[JS],
-  lubridate[days, floor_date],
+  lubridate[floor_date],
   magrittr[`%>%`],
   timetk[pad_by_time],
 )
@@ -425,17 +425,23 @@ bar_chart_helper <- function(obj, x, title, date_range,
     echarts4r$e_tooltip()
 }
 
-date_zero_value_filler <- function(agg_usage, date_range, date_aggregation) {
+date_zero_value_filler <- function(
+  agg_usage,
+  date_range,
+  date_aggregation,
+  week_start = utils$week_start_id
+) {
   if (nrow(agg_usage) == 0) {
     return(agg_usage)
   }
 
-  start_date <- switch(date_aggregation,
-    "week" = floor_date(date_range[1], date_aggregation) + days(1),
-    floor_date(date_range[1], date_aggregation)
-  )
+  start_date <- floor_date(date_range[1], date_aggregation, week_start)
 
   end_date <- date_range[2]
+
+  if (start_date == end_date) {
+    return(agg_usage)
+  }
 
   agg_usage %>%
     pad_by_time(
