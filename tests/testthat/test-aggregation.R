@@ -3,10 +3,12 @@ box::use(
   lubridate[as_datetime],
   magrittr[`%>%`],
   testthat[describe, expect_equal, it],
+  tools[toTitleCase],
 )
 
 box::use(
   app/logic/aggregation[format_agg_usage, process_agg_usage],
+  app/logic/utils[week_start_day],
 )
 
 describe("process_agg_usage", {
@@ -133,8 +135,9 @@ describe("format_agg_usage", {
     expect_equal(
       colnames(result),
       c(
-        "Application", "Username", "Monday Date", "Session count",
-        "Unique users", "Average session duration"
+        "Application", "Username",
+        paste(toTitleCase(week_start_day), "Date"),
+        "Session count", "Unique users", "Average session duration"
       )
     )
     expect_equal(

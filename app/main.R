@@ -38,8 +38,9 @@ box::use(
     AGG_TIME_LEVELS,
     filter_data_by_user,
     get_app_titles,
-    get_grouped_average,
-    process_chart_goal
+    get_date_range_length_in_units,
+    process_chart_goal,
+    week_start_id
   ],
   app/view/footer,
   app/view/navbar_section,
@@ -137,7 +138,7 @@ ui <- function(id) {
               class = "card-header-content",
               inline_info_text(
                 "Average sessions: ", shiny$textOutput(ns("average_sessions")), NULL,
-                "Unique users: ", shiny$textOutput(ns("unique_users")), NULL
+                "Average unique users: ", shiny$textOutput(ns("unique_users")), NULL
               )
             )
         ),
@@ -248,7 +249,8 @@ server <- function(id) {
       shiny$dateRangeInput(
         inputId = session$ns("date_range"), label = "Date range",
         format = "dd M yyyy", separator = "→",
-        start = min_date, end = max_date
+        start = min_date, end = max_date,
+        weekstart = ifelse(week_start_id == 7, 0, week_start_id)
       )
     })
 
@@ -448,32 +450,32 @@ server <- function(id) {
     }
 
     # Summary charts ----
+    date_diff_in_units <- shiny$reactive({
+      get_date_range_length_in_units(
+        input$date_range[1],
+        input$date_range[2],
+        input$date_aggregation
+      )
+    })
+
     output$average_sessions <- shiny$renderText({
       shiny$validate(
         shiny$need(
-          nrow(agg_usage()) > 0, "No data to display."
+          nrow(formatted_usage()) > 0, "No data to display."
         )
       )
 
-      if ("start_date" %in% colnames(agg_usage())) {
-        get_grouped_average(agg_usage(), "start_date", "Session count")
-      } else {
-        mean(agg_usage()$`Session count`)
-      }
+      nrow(formatted_usage()) / date_diff_in_units()
     })
 
     output$unique_users <- shiny$renderText({
       shiny$validate(
         shiny$need(
-          nrow(agg_usage()) > 0, "No data to display."
+          nrow(formatted_usage()) > 0, "No data to display."
         )
       )
 
-      if ("start_date" %in% colnames(agg_usage())) {
-        get_grouped_average(agg_usage(), "start_date", "Unique users")
-      } else {
-        mean(agg_usage()$`Unique users`)
-      }
+      length(unique(formatted_usage()$`Username`)) / date_diff_in_units()
     })
 
     output$plot <- renderEcharts4r({
@@ -524,21 +526,21 @@ server <- function(id) {
     output$total_sessions <- shiny$renderText({
       shiny$validate(
         shiny$need(
-          nrow(agg_usage()) > 0, "No data to display."
+          nrow(formatted_usage()) > 0, "No data to display."
         )
       )
 
-      sum(agg_usage()$`Session count`)
+      nrow(formatted_usage())
     })
 
     output$total_unique_users <- shiny$renderText({
       shiny$validate(
         shiny$need(
-          nrow(agg_usage()) > 0, "No data to display."
+          nrow(formatted_usage()) > 0, "No data to display."
         )
       )
 
-      sum(agg_usage()$`Unique users`)
+      length(unique(formatted_usage()$`Username`))
     })
 
     output$agg_usage_download <- shiny$downloadHandler(

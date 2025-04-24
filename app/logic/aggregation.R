@@ -3,11 +3,14 @@ box::use(
   lubridate[floor_date],
   magrittr[`%>%`],
   stats[setNames],
+  tools[toTitleCase],
 )
 
 box::use(
-  app/logic/config_settings[is_config_valid, read_config_yml],
-  app/logic/utils[map_wday],
+  app/logic/utils[
+    week_start_day,
+    week_start_id
+  ],
 )
 
 #' Aggregate usage data based on specified levels and time period
@@ -16,13 +19,9 @@ box::use(
 #' @param date_aggregation Time period for aggregation
 #' @return Aggregated data frame
 aggregate_usage <- function(usage, agg_levels, date_aggregation) {
-  config <- read_config_yml()
-  week_start_day <- ifelse(is.null(config) & is_config_valid(config, "week_start"),
-    "Monday", config$week_start
-  )
   usage$day <- floor_date(usage$start_date, "day")
   usage$week <- floor_date(usage$start_date, "week",
-    week_start = map_wday(week_start_day)
+    week_start = week_start_id
   )
   usage$month <- floor_date(usage$start_date, "month")
 
@@ -110,7 +109,7 @@ process_agg_usage <- function(usage, agg_levels, date_aggregation, apps, users) 
 #' @export
 format_agg_usage <- function(agg_usage, date_aggregation, format_duration) {
   date_col <- switch(date_aggregation,
-    "week" = "Monday Date",
+    "week" = paste(toTitleCase(week_start_day), "Date"),
     "month" = "Month",
     "Date"
   )
