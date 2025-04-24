@@ -329,6 +329,10 @@ chart_title_helper <- function(obj, title, date_range, disclaimer = FALSE) {
   echarts4r$e_title(
     obj,
     text = title,
+    textStyle = list(
+      overflow = "break",
+      width = 600
+    ),
     subtextStyle = list(fontSize = 14)
   )
 }
