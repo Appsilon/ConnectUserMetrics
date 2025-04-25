@@ -3,11 +3,25 @@ box::use(
   magrittr[`%>%`],
   purrr[map, map_dfr],
   tibble[as_tibble, is_tibble],
+  yaml[
+    read_yaml,
+    yaml.load
+  ],
 )
 
 box::use(
   app/logic/utils[AGG_LEVELS, AGG_TIME_LEVELS],
 )
+
+#' Read yaml file in UTF-8 encoding
+#' @param file_path Path to .yml file
+#' @export
+read_yaml_in_utf8 <- function(file_path) {
+  file_size <- file.info(file_path)$size
+  raw_text <- readBin(file_path, what = "raw", n = file_size)
+  utf8_text <- iconv(rawToChar(raw_text), from = "UTF-8", to = "UTF-8")
+  yaml.load(utf8_text)
+}
 
 #' @export
 split_yml_params <- function(param) {
@@ -36,7 +50,6 @@ read_config_yml <- function(file_path = "config.yml") {
     }
   )
 }
-
 
 validate_apps <- function(config, data) {
   length_flag <- length(config$apps) == 0
