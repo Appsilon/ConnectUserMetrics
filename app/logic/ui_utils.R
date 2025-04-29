@@ -19,7 +19,7 @@ box::use(
   app/logic/config_settings[read_yaml_in_utf8],
 )
 
-brand_path <- "_brand.yml"
+brand_path <- "brand.yml"
 
 charts_theme_template_path <- "app/metrics_theme_template.json"
 
