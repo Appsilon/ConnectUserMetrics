@@ -13,15 +13,18 @@ box::use(
     fixed,
     str_replace_all
   ],
-  yaml[read_yaml],
 )
 
-brand_path <- "_brand.yml"
+box::use(
+  app/logic/config_settings[read_yaml_in_utf8],
+)
+
+brand_path <- "brand.yml"
 
 charts_theme_template_path <- "app/metrics_theme_template.json"
 
 #' @export
-brand <- read_yaml(here(brand_path))
+brand <- read_yaml_in_utf8(here(brand_path))
 
 #' @export
 is_credits_enabled <- isTRUE(brand$meta$credits$enabled)
