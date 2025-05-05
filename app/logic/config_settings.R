@@ -2,24 +2,31 @@ box::use(
   config[get],
   magrittr[`%>%`],
   purrr[map, map_dfr],
+  readr[guess_encoding],
   tibble[as_tibble, is_tibble],
-  yaml[
-    read_yaml,
-    yaml.load
-  ],
+  yaml[yaml.load],
 )
 
 box::use(
   app/logic/utils[AGG_LEVELS, AGG_TIME_LEVELS],
 )
 
-#' Read yaml file in UTF-8 encoding
+#' Read yaml file in UTF-8 encoding regardless of locale.
+#' Returns list with special character if it was written in UTF-8 encoding.
+#' Returns list with corrupted special character if it was written in non-UTF-8 encoding,
+#' however reads the file without warnings and errors
 #' @param file_path Path to .yml file
 #' @export
 read_yaml_in_utf8 <- function(file_path) {
-  file_size <- file.info(file_path)$size
-  raw_text <- readBin(file_path, what = "raw", n = file_size)
-  utf8_text <- iconv(rawToChar(raw_text), from = "UTF-8", to = "UTF-8")
+  encoding <- guess_encoding(file_path)$encoding[1]
+
+  # Read the file using the detected encoding, preserving line breaks for YAML parsing
+  lines <- readLines(file_path, encoding = encoding)
+  full_text <- paste0(lines, collapse = "\n")
+
+  # Convert text to UTF-8
+  utf8_text <- iconv(full_text, from = encoding, to = "UTF-8")
+
   yaml.load(utf8_text)
 }
 
