@@ -5444,5 +5444,16 @@
       "checksum": "ec242ce7b9fceb8293f337774b399718"
     }
   },
-  "users": null
+  "users": null,
+  "extension": {
+    "name": "connect-user-metrics",
+    "title": "Connect User Metrics Insights",
+    "description": "A dashboard to explore the usage of Shiny applications deployed on Connect",
+    "homepage": "https://github.com/posit-dev/connect-extensions/tree/main/extensions/my-content-name",
+    "category": "extension",
+    "tags": ["r", "shiny"],
+    "minimumConnectVersion": "2025.04.0",
+    "version": "0.0.0"
+  }
 }
+
