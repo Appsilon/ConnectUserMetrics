@@ -28,6 +28,23 @@ about_section <- shiny$div(
   )
 )
 
+about_section <- shiny$div(
+  class = "about-section",
+  shiny$div(
+    shiny$markdown("
+> Monitor application adoption, track user engagement, and get usage logs for all your Shiny apps.
+
+This dashboard allows you to easily explore data related to
+shiny apps usage from your Connect account. You can:
+- Choose the period of the analysis
+- Change and combine the grouping variable: date, users and/or applications
+- Filter users and applications
+- Set the minimum session duration of a relevant session
+- Download the data as CSV")
+  )
+)
+
+
 tech_section <- shiny$div(
   class = "tech-section",
   h4(class = "tech-heading", "Powered by"),
