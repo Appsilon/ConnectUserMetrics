@@ -32,15 +32,23 @@ about_section <- shiny$div(
   class = "about-section",
   shiny$div(
     shiny$markdown("
-> Monitor application adoption, track user engagement, and get usage logs for all your Shiny apps.
+> Monitor application adoption, track user engagement,
+and get usage logs for all your Shiny applications.
 
-This dashboard allows you to easily explore data related to
-shiny apps usage from your Connect account. You can:
-- Choose the period of the analysis
-- Change and combine the grouping variable: date, users and/or applications
-- Filter users and applications
-- Set the minimum session duration of a relevant session
-- Download the data as CSV")
+This dashboard provides comprehensive analytics for Shiny applications deployed on
+your Posit Connect account:
+
+- **Analyze usage patterns**: Choose time periods and view data by day, week, or month
+- **Flexible grouping**: Combine data by application, user, and/or
+date to get different perspectives
+- **Interactive visualizations**: View session counts and unique user metrics through
+charts and summary tables
+- **Smart filtering**: Filter by specific applications and users, set minimum session
+duration thresholds
+- **Export capabilities**: Download both raw and aggregated data as CSV files
+- **User insights**: Track both total sessions and unique user engagement across
+your applications
+")
   )
 )
 
