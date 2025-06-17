@@ -24,8 +24,6 @@ about_section <- shiny$div(
   shiny$div(
     class = "brand-summary",
     shiny$markdown("
-#### About this app
-
 Posit Connect User Metrics makes it easy to monitor **application adoption**,
 track **user engagement** and access detailed **usage analytics**
 for all your Shiny applications deployed on Posit Connect.
@@ -110,11 +108,11 @@ server <- function(id) {
           shiny$modalDialog(
             easyClose = TRUE,
             title = brand$meta$app_title,
-            size = "l",
+            size = "xl",
+            h4(class = "brand-heading", "About this app"),
             about_section,
-            shiny$br(),
-            brand_section,
-            tech_section
+            tech_section,
+            brand_section
           )
         )
       }
