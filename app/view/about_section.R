@@ -26,9 +26,10 @@ about_section <- shiny$div(
     shiny$markdown("
 #### About this app
 
-Monitor application adoption, track user engagement, and access detailed usage analytics for all your Shiny applications deployed on Posit Connect.
-
-Perfect for **Connect administrators, app developers, and data teams** who need to understand application performance and user behavior.
+Posit Connect User Metrics makes it easy to monitor **application adoption**,
+track **user engagement** and access detailed **usage analytics**
+for all your Shiny applications deployed on Posit Connect.
+Some key features:
 
 - **Time-based analysis**: View data by day, week, or month across custom time periods
 - **Flexible grouping**: Combine metrics by application, user, and date for different perspectives
