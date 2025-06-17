@@ -21,37 +21,24 @@ box::use(
 about_credits <- brand$meta$credits$about
 
 about_section <- shiny$div(
-  class = "about-section",
+  class = "brand-section",
   shiny$div(
-    class = "about-links",
-    lapply(about_credits$references, \(x) link(x$name, x$link))
-  )
-)
-
-about_section <- shiny$div(
-  class = "about-section",
-  shiny$div(
+    class = "brand-summary",
     shiny$markdown("
-> Monitor application adoption, track user engagement,
-and get usage logs for all your Shiny applications.
+#### About this app
 
-This dashboard provides comprehensive analytics for Shiny applications deployed on
-your Posit Connect account:
+Monitor application adoption, track user engagement, and access detailed usage analytics for all your Shiny applications deployed on Posit Connect.
 
-- **Analyze usage patterns**: Choose time periods and view data by day, week, or month
-- **Flexible grouping**: Combine data by application, user, and/or
-date to get different perspectives
-- **Interactive visualizations**: View session counts and unique user metrics through
-charts and summary tables
-- **Smart filtering**: Filter by specific applications and users, set minimum session
-duration thresholds
-- **Export capabilities**: Download both raw and aggregated data as CSV files
-- **User insights**: Track both total sessions and unique user engagement across
-your applications
+Perfect for **Connect administrators, app developers, and data teams** who need to understand application performance and user behavior.
+
+- **Time-based analysis**: View data by day, week, or month across custom time periods
+- **Flexible grouping**: Combine metrics by application, user, and date for different perspectives
+- **Interactive charts**: Visualize session counts and unique users with dynamic filtering
+- **Smart filtering**: Set minimum session duration and filter by specific apps or users
+- **Data export**: Download raw and aggregated data as CSV files for further analysis
 ")
   )
 )
-
 
 tech_section <- shiny$div(
   class = "tech-section",
