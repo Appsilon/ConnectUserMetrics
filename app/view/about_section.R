@@ -112,8 +112,9 @@ server <- function(id) {
             title = brand$meta$app_title,
             size = "l",
             about_section,
-            tech_section,
-            brand_section
+            shiny$br(),
+            brand_section,
+            tech_section
           )
         )
       }
