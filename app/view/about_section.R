@@ -14,7 +14,6 @@ box::use(
   ],
   app/view/ui_components[
     card,
-    link
   ],
 )
 
