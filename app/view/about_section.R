@@ -70,7 +70,16 @@ brand_section <- shiny$div(
   ),
   shiny$p(
     class = "brand-summary",
-    about_credits$summary
+    shiny$span(
+      about_credits$summary,
+      shiny$a(
+        "Learn more about Appsilon",
+        href = about_credits$references$homepage$link,
+        target = "_blank",
+        rel = "noopener noreferrer",
+        class = "brand-link"
+      )
+    )
   )
 )
 
