@@ -1,4 +1,15 @@
-# Connect Insights Dashboard
+# Connect User Metrics Dashboard
+
+Connect User Metrics makes it easy to monitor **application adoption**,
+track **user engagement** and access detailed **usage analytics**
+for all your Shiny applications deployed on Posit Connect.
+Some key features:
+
+- **Time-based analysis**: View data by day, week, or month across custom time periods
+- **Flexible grouping**: Combine metrics by application, user, and date for different perspectives
+- **Interactive charts**: Visualize session counts and unique users with dynamic filtering
+- **Smart filtering**: Set minimum session duration and filter by specific apps or users
+- **Data export**: Download raw and aggregated data as CSV files for further analysis
 
 ## Environment Variables
 
