@@ -58,7 +58,7 @@ As with environment variables, the [Instrumentation] feature is also configurabl
 Confirm with your Posit Connect admin that instrumentation is enabled.
 
 <!-- Links -->
-[User Guide Vars]: https://docs.posit.com/connect/user/content-settings/#content-vars  
+[User Guide Vars]: https://docs.posit.co/connect/user/content-settings/#content-vars  
 [rsconnect-auth]: https://go.appsilon.com/why-use-rstudio-connect-authentication-user-metrics-app  
 [Configuration appendix]: https://docs.posit.co/connect/admin/appendix/configuration/  
 [DefaultServerEnv]: https://docs.posit.co/connect/admin/appendix/configuration/#Applications.DefaultServerEnv  
