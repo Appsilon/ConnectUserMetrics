@@ -3,7 +3,8 @@ box::use(
   purrr[map],
   testthat,
   tibble[tibble],
-  yaml[write_yaml],
+  withr[with_locale, with_tempdir],
+  yaml[read_yaml, write_yaml],
 )
 
 box::use(
@@ -19,6 +20,120 @@ raw_data <- list(
   apps = data.frame(guid = 1:3, title = c("app1", "app2", "app3")),
   users = data.frame(guid = 1:3, username = c("user1", "user2", "user3"))
 )
+
+file_path <- "test.yml"
+text <- "Developed with "
+utf8_special_character <- "💙"
+non_utf8_special_character <- "<U+0001F499>"
+
+utf8_yaml_lines <- c(
+  "footer:",
+  paste0("  text: \"", text, utf8_special_character, "\"")
+)
+
+utf8_contents <- list(
+  footer = list(
+    text = paste0(text, utf8_special_character)
+  )
+)
+
+non_utf8_contents <- list(
+  footer = list(
+    text = paste0(text, non_utf8_special_character)
+  )
+)
+
+ansi_locale <- if (.Platform$OS.type == "windows") "English_United States.1252" else "en_US.ISO8859-1" # nolint: line_length_linter
+utf8_locales <-  c("en_US.UTF-8", "C.UTF-8")
+non_utf8_locales <- c("C", ansi_locale)
+locales <- c(utf8_locales, non_utf8_locales)
+
+testthat$context(".yml file written in UTF-8 encoding is correctly processed regardless of reading env locale") # nolint: line_length_linter
+for (locale_for_writing in utf8_locales) {
+  with_tempdir({
+    skip_if_locale_unavailable(locale_for_writing)
+
+    # Minimal valid YAML file
+    write_yaml_with_locale(
+      locale = locale_for_writing,
+      yaml_lines = utf8_yaml_lines,
+      file_path = file_path
+    )
+
+    # Read file under each locale
+    for (locale_for_reading in locales) {
+      testthat$test_that(
+        locale_test_name(
+          locale_for_writing,
+          locale_for_reading
+        ),
+        {
+          skip_if_locale_unavailable(locale_for_reading)
+
+          with_locale(c(LC_CTYPE = locale_for_reading), {
+            # yaml written in UTF-8 should contain special character under any locale
+            config_settings$read_yaml_in_utf8(file_path) |>
+              testthat$expect_equal(utf8_contents)
+
+            if (locale_for_reading %in% utf8_locales) {
+              read_yaml(file_path) |>
+                testthat$expect_equal(utf8_contents) |>
+                testthat$expect_no_warning() |>
+                testthat$expect_no_error()
+            } else {
+              # read_yaml() should fail if locale is non-UTF-8
+              read_yaml(file_path) |>
+                testthat$expect_warning() |>
+                testthat$expect_error()
+            }
+
+          })
+        }
+      )
+    }
+  })
+}
+
+testthat$context(".yml file written in non-UTF-8 encoding is correctly processed regardless of reading env locale") # nolint: line_length_linter
+for (locale_for_writing in non_utf8_locales) {
+  with_tempdir({
+    skip_if_locale_unavailable(locale_for_writing)
+
+    # Minimal valid YAML file
+    write_yaml_with_locale(
+      locale = locale_for_writing,
+      yaml_lines = utf8_yaml_lines,
+      file_path = file_path
+    )
+
+    # Read file under each locale
+    for (locale_for_reading in locales) {
+      testthat$test_that(
+        locale_test_name(
+          locale_for_writing,
+          locale_for_reading
+        ),
+        {
+          skip_if_locale_unavailable(locale_for_reading)
+
+          with_locale(c(LC_CTYPE = locale_for_reading), {
+            # yaml written in non-UTF-8 should contain corrupted special character,
+            # however yaml file should be processed without warnings and errors
+            config_settings$read_yaml_in_utf8(file_path) |>
+              testthat$expect_equal(non_utf8_contents) |>
+              testthat$expect_no_warning() |>
+              testthat$expect_no_error()
+
+            # read_yaml() should fail if locale is non-UTF-8
+            read_yaml(file_path) |>
+              testthat$expect_warning() |>
+              testthat$expect_error()
+          })
+        }
+      )
+    }
+  })
+}
 
 testthat$context("Reading config file")
 testthat$test_that("config.yml can be loaded and contains necessary inputs", {
